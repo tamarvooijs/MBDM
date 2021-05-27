@@ -263,11 +263,45 @@ def get_model_for_problem_formulation(problem_formulation_id):
             outcomes.append(ScalarOutcome('RfR Total Costs {}'.format(n), kind=direction))
             outcomes.append(ScalarOutcome('Expected Evacuation Costs {}'.format(n), kind=direction))
         dike_model.outcomes = outcomes
+
+    # Disaggregate over locations:
+    elif problem_formulation_id == 6:
+        outcomes = []
+        
+        for dike in function.dikelist:
+            
+            outcomes.append(ScalarOutcome('{}_Expected Annual Damage'.format(dike),
+                                          variable_name=['{}_Expected Annual Damage {}'.format(
+                                                  dike, n) for n in function.planning_steps],
+                                          function=sum_over, kind=direction))
+            
+            outcomes.append(ScalarOutcome('{}_Dike Investment Costs'.format(dike),
+                                          variable_name=['{}_Dike Investment Costs {}'.format(
+                                                  dike, n) for n in function.planning_steps],
+                                          function=sum_over, kind=direction))
+
+            outcomes.append(ScalarOutcome('{}_Expected Number of Deaths'.format(dike),
+                                          variable_name=['{}_Expected Number of Deaths {}'.format(
+                                                  dike, n) for n in function.planning_steps],
+                                          function=sum_over, kind=direction))
+
+        outcomes.append(ScalarOutcome('RfR Total Costs', 
+                                      variable_name=['RfR Total Costs {}'.format(n
+                                                     ) for n in function.planning_steps],
+                                          function=sum_over, kind=direction))
+        outcomes.append(ScalarOutcome('Expected Evacuation Costs', 
+                                      variable_name=['Expected Evacuation Costs {}'.format(n
+                                                     ) for n in function.planning_steps],
+                                          function=sum_over, kind=direction))
+
+        dike_model.outcomes = outcomes
         
     else:
         raise TypeError('unknownx identifier')
         
     return dike_model, function.planning_steps
+
+
 
 if __name__ == '__main__':
     get_model_for_problem_formulation(3)
